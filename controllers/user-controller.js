@@ -26,14 +26,14 @@ module.exports = {
   },
 
   // Delete a User
-  deleteUser({ params }, res) {
-    User.findOneAndDelete({ _id: params.id })
-    .then(data => {
-        if (!data) {
+  deleteUser(req, res) {
+    User.findOneAndDelete({  _id: req.params.userId })
+    .then(user => {
+        if (!user) {
             res.status(404).json({ message: 'No user found with this id!' })
             return;
         }
-        res.json(data);
+        res.json({message: "User deleted!"});
     })
     .catch(err => {
         console.log(err);
@@ -41,14 +41,14 @@ module.exports = {
     })
 },
 // Update User
-updateUser({ params, body }, res) {
-    User.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true })
-    .then(data => {
-        if (!data) {
+updateUser(req, res) {
+    User.findOneAndUpdate({ _id: req.params.userId }, body, { new: true, runValidators: true })
+    .then(user => {
+        if (!user) {
             res.status(404).json({ message: 'No user found with this id!' })
             return;
         }
-        res.json(data);
+        res.json({message: "User updated!"});
     })
     .catch(err => {
         console.log(err);
@@ -57,17 +57,17 @@ updateUser({ params, body }, res) {
 },
 
 // Add Friend
-addFriend({ params }, res) {
-    User.findByIdAndUpdate(
-        { _id: params.id },
-        { $push: { friends: params.friendId }},
+addFriend(req, res) {
+    User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $addToSet: { friends: req.params.friendId }},
         { new: true, runValidators: true })
-    .then(data => {
-        if (!data) {
+    .then(user => {
+        if (!user) {
             res.status(404).json({ message: 'No user found with this id!' })
             return;
         }
-        res.json(data);
+        res.json(user);
     })
     .catch(err => {
         console.log(err);
@@ -77,16 +77,16 @@ addFriend({ params }, res) {
 
 // Remove Friend
 removeFriend({ params }, res) {
-    User.findByIdAndUpdate(
-        { _id: params.id },
-        { $pull: { friends: params.friendId }},
-        { new: true, runValidators: true })
-    .then(data => {
-        if (!data) {
+    User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $pull: { friends: req.params.friendId }},
+        { new: true })
+    .then(user => {
+        if (!user) {
             res.status(404).json({ message: 'No user found with this id!' })
             return;
         }
-        res.json(data);
+        res.json(user);
     })
     .catch(err => {
         console.log(err);
